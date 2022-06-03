@@ -182,9 +182,10 @@ the percentage of women who have electricity in the home is `r paste(round(100 *
 
 ## (iii) Compute the average of *children* for those without electricity and do the same for those with electricity.  Comment on what you find.
 
-The average number of children born to women without electricity is `r mean(fertil2$children[fertil2$electric == 0], na.rm = TRUE)`
+The average number of children born to women without electricity is `r round(mean(fertil2$children[fertil2$electric == 0], na.rm = TRUE), 2)`
 
-The average number of children born to women with electricity is `r mean(fertil2$children[fertil2$electric == 1], na.rm = TRUE)`
+The average number of children born to women with electricity is `r round(mean(fertil2$children[fertil2$electric == 1], na.rm = TRUE), 2)`
 
 ## (iv) From part (iii), can you infer that having electricity "causes" women to have fewer children? Explain.
 
+As I noted above, association is not causation.  
