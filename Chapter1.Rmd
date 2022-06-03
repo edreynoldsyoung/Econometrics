@@ -4,9 +4,8 @@ author: "Edwin Young"
 date: "2022-06-02"
 output: 
   html_document:
-    theme: null
-    highlight: null
-    css: styles.css
+    toc: true
+    css: style.css
 ---
 
 ```{r setup, include=FALSE}
@@ -15,14 +14,177 @@ library(tidyverse)
 library(wooldridge)
 ```
 
-# C1 Use the data in WAGE1.RAW for this exercise.
+# C1 <span class="a">Use the data in WAGE1.RAW for this exercise.</span> 
+
+
+```{r C1, include=FALSE}
+data("wage1")
+```
+
 
 ## (i) Find the average education level in the sample.  What are the lowest and highest years of education?
 
-## (ii) Find the average hourly wage in the sample.  does it seem high or low?
+The average education level in the sample is `r round(mean(wage1$educ), 2)`
 
-## (iii) The wage data are reported in 1976 dollars.  Using the Economic Report of the President (2011 or later), obtain and report eht Consumer Price Index (CPI) for the years 1976 and 2010.
+The lowest year of education in the sample is `r min(wage1$educ)`
+
+The highest year of education in the sample is `r max(wage1$educ)`
+
+
+## (ii) Find the average hourly wage in the sample.  Does it seem high or low?
+
+The average hourly wage in the sample is `r round(mean(wage1$wage))`
+
+This seams quite low, but likely because it is reported in 1976 dollars.
+
+## (iii) The wage data are reported in 1976 dollars.  Using the Economic Report of the President (2011 or later), obtain and report the Consumer Price Index (CPI) for the years 1976 and 2010.
+
+The CPI for Jan 1976 was 55.80; the CPI for Jan 2010 was 217.488
 
 ## (iv) Use the CPI values from part (iii) to find the average hourly wage in 2010 dollars.  Now does the average hourly wage seem reasonable?
 
+The Inflation-adjusted estimate = 1976 estimate * (2010 CPI-U-RS / 1976 CPI-U-RS) = 6*(217.488/55.80)
+
+The average hourly wage in 2010 dollars is `r round(6*(217.488/55.80), 2)`
+
+This seems like a reasonable average hourly wage.
+
 ## (v) How many women are in the sample?  How many men?
+
+The number of women in the sample is `r sum(wage1$female == 1)`
+
+The number of men in the sample is `r nrow(wage1) - sum(wage1$female == 1)`
+
+# C2 Use the data in BWGHT.RAW to answer this question.
+
+```{r, include=FALSE}
+data("bwght")
+```
+
+## (i) How many women are in the sample, and how many report smoking during pregnancy?
+
+All of the observations are of women, so the number of women in the sample is `r nrow(bwght)`
+
+The number of women reporting that they smoked during preganancy is `r sum(bwght$cigs > 0)`, which is `r round((sum(bwght$cigs > 0)/nrow(bwght))*100, 2)` percent of the women.
+
+## (ii) What is the average number of cigarettes smoked per day? Is the average a good measure of the "typical" woman in this case? Explain.
+
+The average number of cigarettes smoked per day is `r round(mean(bwght$cigs), 2)`.  
+
+This is not a good measure of the "typical" woman, because it averages the number of smokers and non-smokers.
+
+## (iii) Among women who smoke during pregancy, what is the average number of cigarettes smoked per day?  How does this compare with your answer from part (ii) and why?
+
+The average number of cigarettes smoked per day, among women who smoke, is `r round(mean(bwght$cigs[bwght$cigs > 0]), 2)`.
+
+The average number of cigarettes is greater in the subset who smoke, and the average is brought down when we include non-smokers in the denominator.
+
+## (iv) Find the average of fatheduc in the sample.  Why are only 1,192 observations used to compute this average?
+
+The average of fatheduc in the sample is `r round(mean(bwght$fatheduc, na.rm = TRUE), 2)`.
+
+Only 1192 observations are used to compute this average because 196 observations of fatheduc were NA, likely because the father could not be identified.
+
+## (v) Report the average family income and its standard deviation in dollars.
+
+The average family income (in 1988 dollars) is `r paste("$",format(mean(bwght$faminc)*1000, big.mark=","),sep="")`, with a standard deviation of `r paste("$",format(sd(bwght$faminc)*1000, big.mark=","),sep="")`.
+
+# C3 The data in MEAP01.RAW are for the state of Michigan in the year 2001.  Use these data to answer the following questions.
+
+```{r, include=FALSE}
+data("meap01")
+```
+
+
+## (i) Find the largest and smallest values of math4.  Does the range make sense? Explain.
+
+The largest and smallest values of math4 (percent students satisfactory, 4th grade math) is `r max(meap01$math4)` and `r min(meap01$math4)`
+
+These values are percentages, so the range of 0 to 100 is reasonable, however it is surprising that there are districts where no students were satisfactory, and others where every student was satisfactory.
+
+## (ii) How many schools have a perfect pass rate on the math test?  What percentage is this of the total sample?
+
+The number of schools (buildings with distinct codes) that had a perfect pass rate on the math test is `r sum(meap01$math4 == 100)`.  This is `r paste(round(100*sum(meap01$math4 == 100)/nrow(meap01),2), "%", sep="")` of the total sample.
+
+## (iii) How many schools have math pass rates of exactly 50%?
+
+The number of schools with a math pass rate of exactly 50% is `r sum(meap01$math4 == 50)`
+
+## (iv) Compare the average pass rates for the math and reading scores.  Which test is harder to pass?
+
+The average pass rate for the math test is `r paste(round(mean(meap01$math4),2), "%", sep="")`, the average pass rate for the reading test is `r paste(round(mean(meap01$read4), 2), "%", sep="")`.  It seems that the reading test is harder to pass.
+
+## (v) Find the correlation between math4 and read4.  What do you conclude?
+
+The correlation between math4 and read4 is `r round(cor(meap01$math4, meap01$read4), 4)`.  The high correlation indicates that schools where 4th graders did well in math, they also did well in reading.
+
+## (vi) The variable exppp is expenditure per pupil.  find the average of exppp along with its standard deviation.  Would you say there is wide variation in per pupil spending?
+
+The average expenditure per pupil was `r paste("$", round(mean(meap01$exppp), 2), sep="")` and the standard deviation of expenditure is `r paste("$", round(sd(meap01$exppp), 2), sep="")`
+
+I would say that this is a significant variation in per pupil spending.
+
+## (vii) Suppose School A spends $6,000 per student and School B spends %5,500 per student.  By what percentage does School A's spending exceel School B's?  Compare this to 100 * [log(6,000) - log(5,500)] which is the approximation percentage difference based on the difference in the natural logs.
+
+School A spends `r paste(round(100*(6000-5500)/6000, 2), "%", sep ="")` more per student.
+
+This is very close to `r paste(round(100*(log(6000) - log(5500)), 2), "%", sep="")` which is the estimate made by difference in the natural logs.
+
+# C4 The data in JRTAIN2.RAW come from a job training experiment conducted for low-income men during the 1976-1977; lee Lalond (1986)
+
+```{r, include=FALSE}
+data("jtrain2")
+```
+
+
+## (i) Use the indicator variable *train* to determine the fraction of men receiving job training.
+
+The percentage of men receiving jog training is `r paste(round(100*sum(jtrain2$train)/nrow(jtrain2), 2), "%", sep="")`
+
+## (ii) The variable *re78* is earnings from 1978, measured in thousands of 1982 dollars.  Find the averages of *re78* for the sample of men receiving job training and the sample not receiving job training.  Is the difference economically large?
+
+The average earning for the sample of men receiving job training is `r paste("$", format(1000 * round(mean(jtrain2$re78[jtrain2$train == 1]), 2), big.mark = ","), sep="")`
+
+The average earning for the sample of men no receiving job training is `r paste("$", format(1000 * round(mean(jtrain2$re78[jtrain2$train == 0]), 2), big.mark = ","), sep="")`
+
+This is almost a 50% increase in earning which is economically large.
+
+## (iii) The variable unem78 is an indicator of whether a man is unemployed or not in 1978.  What fraction of the men who received job training are unemployed?  What about for men who did not receive job training?  Comment on the difference.
+
+The percent of men who received job training who were unemployed is `r paste(round(100 * sum(jtrain2$unem78[jtrain2$train ==1])/sum(jtrain2$train == 1),2), "%", sep="")`
+
+The percent of men who did not received job training who were unemployed is `r paste(round(100 * sum(jtrain2$unem78[jtrain2$train == 0])/sum(jtrain2$train == 0),2), "%", sep="")`
+
+This is a significant decrease in unemployment for those who received job training.
+
+## (iv) From parts (ii) and (iii), does it appear hat the job training program was effective?  What would make our conlcusions more convincing?
+
+It appears that there is an association of job training with better income and less unemployment.  However, we do not know how the training program was implemented, for example, if the men were assigned to participate in the training program based on characteristics of the men or if the training program was randomly assigned.  We also do not know for certain if there were other factors that occurred simultaneously with the training program.  Because of these design issues, I cannot comment on whether the training program caused the effects we see.
+
+The conclusions would be more convincing if the experiment was randomized between an intervention and control arm using an intention to treat model. It would also be more convincing if it were designed as an interrupted time series observational quasi-experiment - the income and unemployment status of each person tracked over 6 years prior to the intervention, and 6 years after the intervention in order to see if there was a persistent change in the intervention group that did not occur in the control group.
+
+# C5 The data in FERTIL2.DTA were collected on women living in the Republic of Botswana in 1988.  The variable *children* refers to the number of living children.  The varialbe *electric* is a binary indicator equal to one if the woman's home has electricity, and zero if not.
+
+```{r, include=FALSE}
+data("fertil2")
+```
+
+
+## (i) Find the smallest and largest values of *children* in the sample.  What is the average of *children*?
+
+The smallest and largest number of children born to a woman in the sample are `r min(fertil2$children)` and `r max(fertil2$children)`.
+
+The average number of children born to women in the sample is `r round(mean(fertil2$children), 2)`
+
+## (ii) What percentage of women have electricity in the home?
+
+the percentage of women who have electricity in the home is `r paste(round(100 * sum(fertil2$electric, na.rm=TRUE)/nrow(fertil2), 2), "%", sep = "")`
+
+## (iii) Compute the average of *children* for those without electricity and do the same for those with electricity.  Comment on what you find.
+
+The average number of children born to women without electricity is `r mean(fertil2$children[fertil2$electric == 0], na.rm = TRUE)`
+
+The average number of children born to women with electricity is `r mean(fertil2$children[fertil2$electric == 1], na.rm = TRUE)`
+
+## (iv) From part (iii), can you infer that having electricity "causes" women to have fewer children? Explain.
+
