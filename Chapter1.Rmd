@@ -14,7 +14,7 @@ library(tidyverse)
 library(wooldridge)
 ```
 
-# C1 <span class="a">Use the data in WAGE1.RAW for this exercise.</span> 
+# <span class="number">C1</span> <span class="text">Use the data in WAGE1.RAW for this exercise.</span> 
 
 
 ```{r C1, include=FALSE}
@@ -55,7 +55,7 @@ The number of women in the sample is `r sum(wage1$female == 1)`
 
 The number of men in the sample is `r nrow(wage1) - sum(wage1$female == 1)`
 
-# C2 Use the data in BWGHT.RAW to answer this question.
+# <span class="number">C2</span> <span class="text"> Use the data in BWGHT.RAW to answer this question.</span>
 
 ```{r, include=FALSE}
 data("bwght")
@@ -89,7 +89,7 @@ Only 1192 observations are used to compute this average because 196 observations
 
 The average family income (in 1988 dollars) is `r paste("$",format(mean(bwght$faminc)*1000, big.mark=","),sep="")`, with a standard deviation of `r paste("$",format(sd(bwght$faminc)*1000, big.mark=","),sep="")`.
 
-# C3 The data in MEAP01.RAW are for the state of Michigan in the year 2001.  Use these data to answer the following questions.
+# <span class="number">C3</span> <span class="text"> The data in MEAP01.RAW are for the state of Michigan in the year 2001.  Use these data to answer the following questions.</span>
 
 ```{r, include=FALSE}
 data("meap01")
@@ -130,7 +130,7 @@ School A spends `r paste(round(100*(6000-5500)/6000, 2), "%", sep ="")` more per
 
 This is very close to `r paste(round(100*(log(6000) - log(5500)), 2), "%", sep="")` which is the estimate made by difference in the natural logs.
 
-# C4 The data in JRTAIN2.RAW come from a job training experiment conducted for low-income men during the 1976-1977; lee Lalond (1986)
+# <span class="number">C4</span> <span class="text"> The data in JRTAIN2.RAW come from a job training experiment conducted for low-income men during the 1976-1977; lee Lalond (1986)</span>
 
 ```{r, include=FALSE}
 data("jtrain2")
@@ -163,7 +163,7 @@ It appears that there is an association of job training with better income and l
 
 The conclusions would be more convincing if the experiment was randomized between an intervention and control arm using an intention to treat model. It would also be more convincing if it were designed as an interrupted time series observational quasi-experiment - the income and unemployment status of each person tracked over 6 years prior to the intervention, and 6 years after the intervention in order to see if there was a persistent change in the intervention group that did not occur in the control group.
 
-# C5 The data in FERTIL2.DTA were collected on women living in the Republic of Botswana in 1988.  The variable *children* refers to the number of living children.  The varialbe *electric* is a binary indicator equal to one if the woman's home has electricity, and zero if not.
+# <span class="number">C5</span> <span class="text"> The data in FERTIL2.DTA were collected on women living in the Republic of Botswana in 1988.  The variable *children* refers to the number of living children.  The varialbe *electric* is a binary indicator equal to one if the woman's home has electricity, and zero if not.</span>
 
 ```{r, include=FALSE}
 data("fertil2")
