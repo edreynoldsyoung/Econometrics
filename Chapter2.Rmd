@@ -1,0 +1,184 @@
+---
+title: "Chapter 2"
+author: "Edwin Young"
+date: "2022-06-03"
+output: 
+ html_document:
+  toc: true
+  css: style.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(wooldridge)
+library(priceR)
+data("k401k", "ceosal2", "sleep75", "wage2", "rdchem", "meap93", "charity")
+```
+
+# <span class="number">C1</span> <span class="text">The data in 401K.RAW are a subset of data analyzed by Papke (1995) to study the relationship between participation in a 401(k) pension plan and the generosity of the plan. The variable *prate* is the percentage of eligible workers with an active account; this is the variable we would like to explain.  The measure of generosity is the plan match rate, *mrate*. This variable gives the average amount the firm contributes to each worker's plan for each $1 contribution by the worker.  for exampl, if *mrate*= 0.50, then a $1 contribution by the worker is matched by a $0.50 contribution by the firm.</span>
+
+
+
+## (i) Find the average participation rate and the average match rate in the sample of plans.
+
+The average participation rate in the sample of plans is `r round(mean(k401k$prate),2)`.
+
+The average match rate in the sample of plans is `r round(mean(k401k$mrate),2)`
+
+## (ii) Now, estimate the simple regression equation $\hat{prate}=\hat{\beta_0} + \hat{\beta_1}mrate$, and report the results along with the sample size and R-squared.
+
+```{r}
+model401k <- lm(prate~mrate, k401k)
+with(k401k,plot(mrate,prate))
+abline(a=model401k$coefficients[1], b=model401k$coefficients[2])
+```
+
+$\hat{prate}$ = `r round(model401k$coefficient[1], 2)` + `r round(model401k$coefficient[2], 2)`$mrate$
+
+Sample Size = `r summary(model401k)$df[1]+summary(model401k)$df[2]`
+
+$R^2$ = `r round(summary(model401k)$r.squared, 4)`
+
+## (iii) Interpret the intercept in your equation.  Interpret the coefficient on *mrate*.
+
+The intercept of 83.08 means that on average, a little more than 83% of workers will participate in a 401k plan even when the company provides no matching funds.
+
+The coefficient 0f mrate of 5.86 means that, on average, for each dollar for dollar match that the company provides, the percent participation goes up by almost 6%
+
+## (iv) Find the predicted *prate* when *mrate* = 3.5.  Is this a reasonable prediction?  Explain what is happening here.
+
+The predicted *prate* when *mrate* = 3.5 is `r round(model401k$coefficients[1] + model401k$coefficients[2]*3.5, 2)`.
+
+Clearly, a rate that is over 100% is not possible.  I interpret two things here - one is that the relationship is not completely linear, and a better model might be to use sigmoid function.  The second interpretation is that at a certain level of generosity, almost everyone will participate in a 401k plan, and that level of generosity is likely to be close to $3.50 given for every $1 that the employee contributes.
+
+## (v) How much of the variation in *prate* is explained by *mrate*? Is this a lot in your opinion?
+
+The variation in dependent variable that is explained by the independent variable is measured by $R^2$.  In this case that is `r paste(round(100 * summary(model401k)$r.squared, 2), "%", sep="")`.  In my opinion, since the matching rate leaves almost 93% of the variation in participation rate unexplained, matching rate alone is not sufficient.
+
+# <span class="number">C2</span> <span class="text">The data set in CEOSAL2.RAW contains information on chief executive officers for U.S. corporations.  The variable *salary* is annual compensation, in thousands of dollars, and *ceoten* is prior number of years as company CEO.</span>
+
+## (i) Find the average salary and the average tenure in the sample.
+
+The average salary in the sample is `r format_dollars(mean(ceosal2$salary)*1000, digits=2)`.
+
+The average tenure in the sample is `r round(mean(ceosal2$comten),2)` years with the company.
+
+The average years as ceo with the company is `r round(mean(ceosal2$ceoten),2)` 
+
+## (ii) How many CEOs are in their first year as CEO (that is, *ceoten* = 0)? What is the longest tenure as a CEO?
+
+The number of CEOS in their first year is `r sum(ceosal2$ceoten == 0)`.  The longest tenure as a CEO is `r max(ceosal2$ceoten)` years.
+
+## (iii) Estimate the simple regression model $log(salary) = \beta_0 + \beta_1 ceoten + \mu$, and report your results in the usual form.  What is the (approximate) predicted percentage increase in salary given one more year as a CEO?
+
+```{r}
+modelceo <- lm(log(salary)~ceoten, ceosal2)
+with(ceosal2,plot(ceoten,log(salary)))
+abline(a=modelceo$coefficients[1], b=modelceo$coefficients[2])
+```
+
+$\hat{log(salary)}$ = `r round(modelceo$coefficient[1], 2)` + `r round(modelceo$coefficient[2], 2)`$ceoten$
+
+Sample Size = `r summary(modelceo)$df[1]+summary(modelceo)$df[2]`
+
+$R^2$ = `r round(summary(modelceo)$r.squared, 4)`
+
+Using the log difference method, the predicted percentage increase in salary, given one more year as CEO, can be approximated as `r paste(round(100*(log(mean(ceosal2$salary)+modelceo$coefficient[2]*mean(ceosal2$salary)) - log(mean(ceosal2$salary))), 2), "%", sep="")`.
+
+This corresponds to the slope of the regression model of 0.01.
+
+# <span class="number">C3</span> <span class="text">Use the data in SLEEP75.RAW from Biddle and Hamermesh (1990) to study whether there is a tradeoff between the time spent sleeping per week and the time spent in paid work.  We should use either variable as the dependent variable.  For concreteness, estimate the model $sleep = \beta_0 + \beta_1 totwrk + \mu$, where *sleep* is minutes spent sleeping at night per week and totwrk is total minutes worked during the week.</span>
+
+## (i) Report your results in equation form along with the number of observation and $R^2$.  What does the intercept in this equation mean?
+
+```{r}
+modelsleep <- lm(sleep~totwrk, sleep75)
+with(sleep75,plot(totwrk,sleep))
+abline(a=modelsleep$coefficients[1], b=modelsleep$coefficients[2])
+```
+
+$\hat{sleep}$ = `r round(modelsleep$coefficient[1], 2)` + `r round(modelsleep$coefficient[2], 2)`$totwrk$
+
+Sample Size = `r summary(modelsleep)$df[1]+summary(modelsleep)$df[2]`
+
+$R^2$ = `r round(summary(modelsleep)$r.squared, 4)`
+
+## (ii) It *totwrk* increase by 2 hours, by how much is *sleep* estimated to fall?  Do you find this to be a large effect?
+
+If the total number of minutes worked during the week increased by 120 (2 hours), I would estimate that the number of minutes sleeping would decrease by 18. I do not believe this is a large effect.  Only about 10% of the variance in sleep is explained by work time.
+
+# <span class="number">C4</span> <span class="text">Use the data in WAGE2.RAW to estimate a simple regression explaining monthly salary (*wage*) in terms of IQ score (*IQ*)</span>
+
+## (i) Find the average salary and average IQ in the sample.  What is the sample standard deviation of IQ? (IQ scores are standardized so that the average in the populaton is 100 with a standard deviation equal to 15.)
+
+The average monthly earning in the sample is `r format_dollars(mean(wage2$wage, na.rm=TRUE),digits=2)`.
+
+The average IQ in the sample is `r round(mean(wage2$IQ),2)`
+
+## (ii) Estimate a simple regression model where a one-point increase in IQ changes wage by a constant dollar amount.  Use this model to find the predicted increase in wage for an increase in IQ of 15 points.  Does IQ explain most of the variation in wage?
+
+```{r}
+modelwage <- lm(wage~IQ, wage2)
+with(wage2,plot(IQ,wage))
+abline(a=modelwage$coefficients[1], b=modelwage$coefficients[2])
+```
+
+$\hat{wage}$ = `r round(modelwage$coefficient[1], 2)` + `r round(modelwage$coefficient[2], 2)`$IQ$
+
+Sample Size = `r summary(modelwage)$df[1]+summary(modelwage)$df[2]`
+
+$R^2$ = `r round(summary(modelwage)$r.squared, 4)`
+
+The predicted increase in wage for an increase in IQ of 15 points would be (15*8.3) = `r format_dollars(15*8.3, digits=2)`
+
+$R^2$ is 0.0955, so IQ explains about 10% of the variation in wages.
+
+## (iii) Now, estimate a model where each one-point increase in IQ has the same percentage effect on *wage*.  If IQ increase by 15 points, what is the approximate percentage increase in predicted *wage*?
+
+A model where an increase in the independent variable estimates a constant percentage increase in the dependent variable uses the log of the dependent variable:
+
+```{r}
+modelwage2 <- lm(log(wage)~IQ, wage2)
+with(wage2,plot(IQ,log(wage)))
+abline(a=modelwage2$coefficients[1], b=modelwage2$coefficients[2])
+```
+
+$\hat{log(wage)}$ = `r round(modelwage2$coefficient[1], 2)` + `r round(modelwage2$coefficient[2], 2)`$IQ$
+
+Sample Size = `r summary(modelwage2)$df[1]+summary(modelwage2)$df[2]`
+
+$R^2$ = `r round(summary(modelwage2)$r.squared, 4)`
+
+The predicted increase percentage in wage for an increase in IQ of 15 points would be (15*0.01)*100 = `r paste(15,"%", sep="")`
+
+This is in line with the calculation made in part (ii) - the average wage in the sample is $957.95, and the predicted increase in wage for an increase in IQ of 15 points was $124.50.  124.50/957.95 = 13%
+
+# <span class="number">C5</span> <span class="text">For the population of firms in the chemical industry, let *rd* denote annual expenditures on research and development, and let *sales* denote annual sales (both are in millions of dollars).</span>
+
+## (i) Write down a model (not an estimated equation) that implies a constant elasticity between *rd* and *sales*.  Which parameter is the elasticity?
+
+$\hat{log(rd)}=\beta_0 + \beta_1 * log(sales) + \mu$
+
+$\beta_1$ is the elasticity of rd with respect to sales.
+
+## (ii) Now, estimate the model using the data in RDCHEM.RAW.  Write out the estimated equation in the usual form.  What is the estimated elasticity of *rd* with respect to *sales*?  Explain in words what this elasticity means.
+```{r}
+modelrdchem <- lm(log(rd)~log(sales), rdchem)
+with(rdchem,plot(log(sales),log(rd)))
+abline(a=modelrdchem$coefficients[1], b=modelrdchem$coefficients[2])
+```
+
+$\hat{log(rd)}$ = `r round(modelrdchem$coefficient[1], 2)` + `r round(modelrdchem$coefficient[2], 2)`$log(sales)$
+
+Sample Size = `r summary(modelrdchem)$df[1]+summary(modelrdchem)$df[2]`
+
+$R^2$ = `r round(summary(modelrdchem)$r.squared, 4)`
+
+The estimated elasticity of *rd* with respect to *sales* is 1.08.  This means that a 1.08% change in in research and development would be expected for each 1% percentage change in sales.
+
+# <span class="number">C6</span> <span class="text">We used the data in MEAP93.RAW for Example 2.12.  Now we want to explore the relationship between the math pass rate (*math10*) and spending per student (*expend*).</span>
+
+## (i) Do you think each additional dollar spent has the same effect on the pass rate, or does a diminishing effect seem more apppropriate? Explain.
+
+
